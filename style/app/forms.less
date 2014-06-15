@@ -1,0 +1,27 @@
+
+// Layout
+// --------------------------------------------------------
+
+input[type=button],
+input[type=submit],
+input[type=reset],
+button {
+    border: 0;
+    font-family: @sansFontFamily;
+    padding: 5px 10px;
+
+    &.primary {
+        color: @color-white;
+        background-color: @color-highlight;
+    }
+
+    &.cancel {
+        color: @color-white;
+        background-color: @color-sec-red;
+    }
+
+    &.info {
+        color: @color-white;
+        background-color: @color-sec-green;
+    }
+}

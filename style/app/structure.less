@@ -1,0 +1,63 @@
+
+
+// General
+// --------------------------------------------------------------------
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: @color-bg;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    border-bottom: 2px solid @color-grey-60;
+}
+
+
+// UI
+// -------------------------------------------------------------------
+
+[class*="bar-"] {
+    padding: 25px;
+    text-transform: uppercase;
+
+    &.bar-dark {
+        background: @color-bg-darkgreen;
+        color: @color-text-mediumgreen;
+    }
+
+    &.bar-medium {
+        background: @color-bg-mediumgreen;
+        color: @color-text-mediumgreen;
+    }
+
+    &.bar-light {
+        background: @color-bg-lightgreen;
+        color: @color-grey-100;
+    }
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+}
+
+
+// Page
+// -------------------------------------------------------------------
+
+body.page-flush {
+
+    > header {
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: 200;
+    }
+
+}

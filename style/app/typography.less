@@ -1,0 +1,57 @@
+
+// Custom Fonts
+// -------------------------------------------------
+
+
+// Colors
+// --------------------------------------------------------------------
+
+.bg-green { background-color: @color-bg-green; }
+.bg-darkgreen { background-color: @color-bg-darkgreen; }
+.bg-mediumgreen { background-color: @color-bg-mediumgreen; }
+.bg-lightgreen { background-color: @color-bg-lightgreen; }
+
+.color-white { color: @color-white; }
+.color-lime { color: @color-text-lime; }
+.color-orange { color: @color-text-orange; }
+.color-purple { color: @color-text-purple; }
+.color-green { color: @color-text-green; }
+.color-mediumgreen { color: @color-text-mediumgreen; }
+
+
+// General
+// --------------------------------------------------------------------
+
+html, body {
+    font-family: @sansFontFamily;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: @headerFontFamily;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    > small {
+        font-family: @cursiveFontFamily;
+        font-weight: normal;
+        text-transform: none;
+    }
+}
+
+h1 {
+    font-size: 1.65em;
+}
+
+blockquote {
+    color: @color-text-green;
+    font-family: @cursiveFontFamily;
+    font-size: 40px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
