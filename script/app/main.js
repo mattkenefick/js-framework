@@ -13,7 +13,7 @@
     window.namespace = namespace;
 
     var UA               = navigator.userAgent,
-        isIFrame         = window !== window.top,
+        isIFrame         = (function() { try { return window !== window.top; } catch(e) { return true; } })(),
         isFile           = location.protocol == 'file:',
         isLocal          = /localhost$/.test(location.hostname) || isFile,
         isIOS            = /ip(hone|od|ad)/i.test(UA),
