@@ -5,7 +5,7 @@
 //     For all details and documentation:
 //     http://backbonejs.org
 
-(function(){
+;(function(){
 
   // Initial Setup
   // -------------
@@ -61,6 +61,8 @@
   // `application/x-www-form-urlencoded` instead and will send the model in a
   // form param named `model`.
   Backbone.emulateJSON = false;
+
+  // Backbone.emulateForm = false;
 
   // Backbone.Events
   // ---------------
@@ -1131,7 +1133,8 @@
     // Default options, unless specified.
     _.defaults(options || (options = {}), {
       emulateHTTP: Backbone.emulateHTTP,
-      emulateJSON: Backbone.emulateJSON
+      emulateJSON: Backbone.emulateJSON,
+      emulateForm: Backbone.emulateForm
     });
 
     // Default JSON-request options.

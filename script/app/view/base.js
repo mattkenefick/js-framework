@@ -18,28 +18,48 @@
 
         views: null,
 
+        // boolean for whether or not the render has happened
+        rendered: false,
+
+
         initialize: function(options) {
             options || (options = {});
 
             // bind
             _.bindAll(this, '_onAnimateIn', '_onAnimateOut');
 
+            // merge options
+            _.extend(this, options);
+
             // views
             this.views = new namespace.View_Views(this);
-            this.$v    = _.bind(function(x) {
+            this.v     = _.bind(function(x) {
                 return this.views.get(x);
             }, this); // alias;
 
             // parent
             this.parent = options.parent || window;
+
+            // template
+            if (this.templateName) {
+                this.template = $('#' + this.templateName).html();
+                this.twig     = twig({ data: this.template });
+            }
+
+            if (this.template && (this.isPage || this.autoRender)) {
+                this.$el.html( this.twig.render() );
+            }
         },
 
         attachEvents: function() {
             this.detachEvents();
             this.delegateEvents(this.events);
+            this.views.execAll('attachEvents');
         },
 
         detachEvents: function() {
+            this.views.execAll('detachEvents');
+
             this.undelegateEvents();
         },
 
@@ -194,6 +214,10 @@
         // Getters
         // --------------------------------------------------------------
 
+        hasRendered: function() {
+            return !!this.rendered;
+        },
+
         isBottomVisible: function() {
             var position = this.$el.position();
 
@@ -207,6 +231,10 @@
 
         isHidden: function() {
             return !!this.$el.hasClass('hide');
+        },
+
+        isLocked: function() {
+            return this.locked === true;
         },
 
 
@@ -241,11 +269,17 @@
         _onAnimateIn: function() {
             this._setAnimateIn();
 
+            // state
+            this.$el.addClass('state-animated-in');
+
             this.trigger(Events.ANIMATE_IN);
         },
 
         _onAnimateOut: function() {
             this._setAnimateOut();
+
+            // state
+            this.$el.removeClass('state-animated-in');
 
             this.trigger(Events.ANIMATE_OUT);
         }

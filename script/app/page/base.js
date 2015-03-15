@@ -36,6 +36,14 @@
             return this;
         },
 
+        render: function() {
+            // super
+            namespace.View_Base.prototype.render.call(this);
+
+            // body
+            namespace.$body.addClass("rendered");
+        },
+
 
         // Animation
         // ---------------------------------------------------------

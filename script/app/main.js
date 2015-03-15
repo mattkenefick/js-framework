@@ -31,6 +31,15 @@
         isDebug          = window['DEBUG_MODE'],
 
         Colors = namespace.Colors = {
+            CRITICAL : { background: "#f00",    color: "#fff" },
+            IMPORTANT: { background: "#dcf9dd", color: "#4e8e4e" },
+            DEBUG    : { background: "#0E5342", color: "#93d9c7" },
+            LOADING  : { background: "#2099cd", color: "#fff" },
+            SOUND    : { background: "#003300", color: "#66FF66" },
+            TRACKING : { background: "#c3f1c2", color: "#357733" },
+            VIEW     : { background: "#fce6bc", color: "#b5862b" },
+            WARN     : { background: "#f8ea6c", color: "#9c6d1b" },
+
             BLUE  : '#2f5ea8',
             GREY  : '#999999',
             RED   : '#b22e31',
@@ -42,15 +51,16 @@
             // String constants
             OFF   : 'off',
             ON    : 'on',
+
+            // Directional
             BOTTOM: 'bottom',
             LEFT  : 'left',
             RIGHT : 'right',
             TOP   : 'top',
 
             // Numeric constants
-            ANIMATION_DURATION: 250,
-            RAD_TO_DEG        : 180 / Math.PI,
-            DEG_TO_RAD        : Math.PI / 180
+            RAD_TO_DEG: 180 / Math.PI,
+            DEG_TO_RAD: Math.PI / 180
         },
 
         Events = namespace.Events = {
@@ -156,6 +166,7 @@
             // Similar to pages, but URLs
         };
 
+
     _.extend(namespace, Backbone.Events, {
         parent   : window.top,
         $document: $(document),
@@ -181,55 +192,21 @@
         interpolate: /\{\{(.+?)\}\}/g
     };
 
-    namespace.func.ord = function(number) {
-        return number + ( [,'st','nd','rd'][/1?.$/.exec(number)] || 'th' );
-    };
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
 
-    namespace.func.redirect = function(url) {
-        window.location.href = url;
-    };
-
-    namespace.func.template = function(id, params) {
-        return _.template($('#template-' + id).html(), params);
-    };
-
-    namespace.func.url = function(key) {
-        var items, found, hash = {};
-
-        items = window.location.href.split('?')[1] + '';
-        items = items.split('+').join(' ');
-
-        _.each(items.split('&'), function(value) {
-            var keyval = value.split('=', 2);
-            hash[keyval[0]] = decodeURIComponent(keyval[1]);
-        }, this);
-
-        return key ? hash[key] : hash;
-    };
-
-    namespace.func.shadeRGB = function(color, percent) {
-        var f = color.indexOf('#') > -1 ? hexToRgb(color) : color.split(","),
-            t = percent < 0 ? 0 : 255,
-            p = percent < 0 ? percent * -1 : percent,
-            R = parseInt(f[0]),
-            G = parseInt(f[1]),
-            B = parseInt(f[2]);
-
-        return "rgb(" +
-            (Math.round((t-R)*p)+R) + "," +
-            (Math.round((t-G)*p)+G) + "," +
-            (Math.round((t-B)*p)+B) +
-        ")";
-    }
-
-    function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
-    }
+    _.mixin({
+        bindDelay: function(func, delayMs, context) {
+            var boundVersion = _(func).bind(context || func);
+            _(boundVersion).delay(delayMs);
+        }
+    });
 
 
     // Load
@@ -258,101 +235,5 @@
             namespace.Router.init();
         }
     });
-
-
-    // Extend Backbone
-    // ------------------------------------------------------------------
-
-    if (window['Hammer']) {
-        Backbone.View.prototype.delegateEvents = function(events) {
-            if (!(events || (events = _.result(this, 'events')))) return this;
-            this.undelegateEvents();
-
-            for (var key in events) {
-                var method = events[key];
-                if (!_.isFunction(method)) method = this[events[key]];
-                if (!method) continue;
-
-                var match = key.match(/^(\S+)\s*(.*)$/);
-                var eventName = match[1], selector = match[2];
-                method = _.bind(method, this);
-                eventName += '.delegateEvents' + this.cid;
-
-                if (selector === '') {
-                    this.$el.hammer().on(eventName, method);
-                } else {
-                    this.$el.hammer().on(eventName, selector, method);
-                }
-            }
-            return this;
-        };
-
-        Hammer.gestures.Tap.defaults.tap_max_touchtime = 300;
-        Hammer.gestures.Tap.defaults.tap_max_distance = 10;
-    }
-
-    Backbone.View.prototype.log = function() {
-        var args = Array.prototype.slice.call(arguments, 0, arguments.length);
-
-        args.unshift("[" + this.name + "]");
-
-        console.log.apply(console, args);
-    };
-
-    Backbone.View.prototype.warn = function() {
-        var args = Array.prototype.slice.call(arguments, 0, arguments.length);
-
-        args.unshift("[" + this.name + "]");
-
-        console.warn.apply(console, args);
-    };
-
-    window.requestAnimFrame = (function(){
-      return  window.requestAnimationFrame       ||
-              window.webkitRequestAnimationFrame ||
-              window.mozRequestAnimationFrame    ||
-              function( callback ){
-                window.setTimeout(callback, 1000 / 60);
-              };
-    })();
-
-    _.mixin({
-        bindDelay: function(func, delayMs, context) {
-            var boundVersion = _(func).bind(context || func);
-            _(boundVersion).delay(delayMs);
-        }
-    });
-
-
-    // Console
-    // ----------------------------------------------------------
-
-    if (!Flags.isLocal) {
-        // remove console logging
-        $.extend(console, {
-            color         : $.noop,
-            debug         : $.noop,
-            error         : $.noop,
-            info          : $.noop,
-            log           : $.noop,
-            warn          : $.noop,
-            dir           : $.noop,
-            dirxml        : $.noop,
-            table         : $.noop,
-            trace         : $.noop,
-            assert        : $.noop,
-            count         : $.noop,
-            markTimeline  : $.noop,
-            profile       : $.noop,
-            profileEnd    : $.noop,
-            time          : $.noop,
-            timeEnd       : $.noop,
-            timeStamp     : $.noop,
-            group         : $.noop,
-            groupCollapsed: $.noop,
-            groupEnd      : $.noop,
-            clear         : $.noop
-        })
-    }
 
 })(window.pm || (window.pm = {}));

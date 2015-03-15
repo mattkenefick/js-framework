@@ -36,6 +36,8 @@
                 throw name + ' is already a sub-view';
             }
 
+            view._viewKey = name;
+
             this._views.push(view);
             this._byId[name] = view;
 
@@ -54,16 +56,25 @@
         },
 
         get: function(nameOrModel) {
-            var name = this._getModelCidOrName(nameOrModel);
+            var obj, parts;
 
-            // string
-            if (this.has(name)) {
-                return this._byId[name];
+            // get descending children
+            if (name.indexOf(' ') > -1) {
+                parts = name.split(' ');
+                name  = parts[0];
+                obj   = this._get(name);
+                parts.shift();
+
+                return obj.views.get(parts.join(' '));
             }
 
-            // number
-            else if (typeof(nameOrModel) == 'number') {
-                return this._views[nameOrModel];
+            return this._get(name);
+        },
+
+        _get: function(nameOrModel) {
+            var name = this._getModelCidOrName(nameOrModel);
+            if (this.has(name)) {
+                return this._byId[name];
             }
         },
 
@@ -124,6 +135,20 @@
             return this.remove(names);
         },
 
+        debug: function() {
+            var object = [];
+
+            this.each(function(view) {
+                object.push({
+                    cid: view.cid,
+                    key: view._viewKey,
+                    name: view.name
+                });
+            });
+
+            console.table(object);
+        },
+
         invoke: function() {
             return _.invoke.apply(_, [this._views].concat(_.toArray(arguments)));
         },
@@ -148,12 +173,15 @@
             return _.all.apply(_, [this._views].concat(_.toArray(arguments)));
         },
 
-        execAll: function(methodName, params) {
+        execAll: function(methodName, except) {
+            except || (except = []);
             var args = _.toArray(arguments);
                 args.shift();
 
             _.each(this._views, function(view, index) {
-                view[methodName].apply(view, args);
+                if (!_(except).contains(view._viewName)) {
+                    view[methodName].apply(view, args);
+                }
             }, this);
         },
 
